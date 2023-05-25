@@ -1,15 +1,22 @@
 ﻿@model ShopMVC.ViewModels.SimpleProductViewModel[]
 
 @{
-    ViewData["Title"] = "Products";
+    ViewData["Title"] = "Index";
 }
-<h1>@ViewData["Title"]</h1>
-<table>
-@foreach (var product in Model)
-{
-    <tr>
-        <td>@product.Name</td>
-        <td>@product.Price</td>
-    </tr>
-}
-</table>
+<div class="container p-3">
+    @foreach (var product in Model)
+    {
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">@product.Name</h5>
+                <p class="card-text">@product.Price</p>
+                <a href="#" class="btn btn-primary">Read more</a>
+            </div>
+        </div>
+    }
+
+</div>

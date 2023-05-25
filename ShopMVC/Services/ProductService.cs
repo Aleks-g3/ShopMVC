@@ -1,4 +1,6 @@
-﻿using ShopMVC.Data.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using ShopMVC.Data;
+using ShopMVC.Data.Repositories;
 using ShopMVC.Models.Shared;
 using ShopMVC.ViewModels;
 
@@ -7,18 +9,24 @@ namespace ShopMVC.Services;
 public class ProductService : IProductService
 {
     private readonly ILogger<ProductService> _logger;
-    private readonly IProductRepository _productRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ProductService(ILogger<ProductService> logger, IProductRepository productRepository)
+    public ProductService(ILogger<ProductService> logger, IUnitOfWork unitOfWork)
     {
         _logger = logger;
-        _productRepository = productRepository;
+        _unitOfWork = unitOfWork;
     }
-    
+
+    public Task<ProductViewModel[]> GetAll()
+    {
+        return _unitOfWork.ProductRepository.GetAll().Select(product => ProductViewModel.Create(product))
+            .ToArrayAsync();
+    }
+
     public async Task<SimpleProductViewModel[]> GetAllSimpleProducts()
     {
-        var products = await _productRepository.GetAll();
-        
+        var products = await _unitOfWork.ProductRepository.GetAll().ToArrayAsync();
+
         _logger.LogInformation($"Getting products is {products.Length}");
         return products.Select(product => new SimpleProductViewModel()
         {
@@ -30,7 +38,7 @@ public class ProductService : IProductService
     public async Task Create(Product newProduct)
     {
         _logger.LogInformation($"Creating product with name '{newProduct.Name}'");
-        await _productRepository.Create(newProduct);
+        await _unitOfWork.ProductRepository.Create(newProduct);
         _logger.LogInformation($"Creating product with name '{newProduct.Name}' Finished");
     }
 }

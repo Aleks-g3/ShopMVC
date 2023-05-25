@@ -1,12 +1,9 @@
 ﻿using ShopMVC.Models.Shared;
+using ShopMVC.ViewModels;
 
 namespace ShopMVC.Data.Repositories;
 
-public interface IProductRepository
+public interface IProductRepository : IUpdateableRepository<Product>
 {
-    Task Create(Product product);
-    Task Update(Product product);
-    Task<Product[]> GetAll();
     Task<Product?> GetById(long productId);
-    Task DeleteById(long productId);
 }

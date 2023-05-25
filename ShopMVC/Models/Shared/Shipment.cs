@@ -4,8 +4,8 @@ namespace ShopMVC.Models.Shared;
 
 public class Shipment : UpdatableEntity
 {
-    public string City { get;}
-    public string StreetName { get;}
+    public string City { get; } = string.Empty;
+    public string StreetName { get; } = string.Empty;
     public int StreetNumber { get; }
     public string ReceiverFullName { get; }
     public ShipmentMethod ShipmentMethod { get; }
@@ -13,8 +13,9 @@ public class Shipment : UpdatableEntity
     public Shipment()
     {
     }
-        
-    public Shipment(string city, string streetName, int streetNumber, string receiverFullName, ShipmentMethod shipmentMethod)
+
+    public Shipment(string city, string streetName, int streetNumber, string receiverFullName,
+        ShipmentMethod shipmentMethod)
     {
         if (string.IsNullOrWhiteSpace(city))
         {

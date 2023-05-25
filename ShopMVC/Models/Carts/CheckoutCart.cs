@@ -6,13 +6,13 @@ namespace ShopMVC.Models.Carts;
 
 public class CheckoutCart
 {
-    private List<CartProduct> _products = new();
-    
+    private readonly List<CartProduct> _products;
+
     public string UserId { get; }
     public Shipment Shipment { get; private set; }
     public Payment Payment { get; private set; }
     public IReadOnlyCollection<CartProduct> Products => _products;
-    
+
     internal CheckoutCart(Cart cart)
     {
         UserId = cart.UserId;

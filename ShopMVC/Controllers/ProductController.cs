@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using ShopMVC.Data.Repositories;
 using ShopMVC.Extensions;
 using ShopMVC.Services;
 using ShopMVC.ViewModels;
+using Controller = Microsoft.AspNetCore.Mvc.Controller;
 
 namespace ShopMVC.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 public class ProductController : Controller
 {
     private readonly IProductService _productService;
@@ -21,20 +22,21 @@ public class ProductController : Controller
     {
         return View();
     }
-    
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+
+    [Microsoft.AspNetCore.Mvc.HttpPost]
+    [Microsoft.AspNetCore.Mvc.ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateProductFormDto createProductFormDto)
     {
         var newProduct = createProductFormDto.MapToProduct();
 
         await _productService.Create(newProduct);
-        
+
         return RedirectToAction("Manage");
     }
 
-    public IActionResult Manage()
+    public async Task<IActionResult> Manage()
     {
-        return View();
+        var productViewModels = await _productService.GetAll();
+        return View(productViewModels);
     }
 }

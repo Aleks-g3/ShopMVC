@@ -2,11 +2,7 @@
 
 namespace ShopMVC.Data.Repositories;
 
-public interface IOrderRepository
+public interface IOrderRepository : IUpdateableRepository<Order>
 {
-    Task Create(Order order);
-    Task Update(Order order);
-    Task<Order[]> GetAll();
     Task<Order?> GetById(long orderId);
-    Task DeleteById(long orderId);
 }
