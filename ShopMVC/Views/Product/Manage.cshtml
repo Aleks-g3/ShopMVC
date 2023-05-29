@@ -1,4 +1,4 @@
-﻿@model ShopMVC.ViewModels.ProductViewModel[]
+﻿@model ShopMVC.ViewModels.UpdatableProductViewModel[]
 
 @{
     ViewData["Title"] = "Manage";
@@ -20,8 +20,10 @@
         <tr>
             <td>Name</td>
             <td>Category</td>
-            <td>AvailableQuantity</td>
+            <td>Available Quantity</td>
             <td>Price</td>
+            <td>Modified On</td>
+            <td>Modified By</td>
             <td>Action</td>
         </tr>
         @foreach (var product in Model)
@@ -31,6 +33,8 @@
                 <td>@product.Category</td>
                 <td>@product.AvailableQuantity</td>
                 <td>@product.Price</td>
+                <td>@product.ModifiedOn</td>
+                <td>@product.ModifiedBy</td>
                 <td>
                     <a class="btn btn-primary">
                         <i class="bi bi-pencil-fill"></i>

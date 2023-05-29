@@ -36,7 +36,7 @@ public class ProductController : Controller
 
     public async Task<IActionResult> Manage()
     {
-        var productViewModels = await _productService.GetAll();
-        return View(productViewModels);
+        var updatableProductViewModels = await _productService.GetAll();
+        return View(updatableProductViewModels);
     }
 }

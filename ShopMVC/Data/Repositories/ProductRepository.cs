@@ -13,4 +13,9 @@ public class ProductRepository : UpdateableRepository<Product>, IProductReposito
     {
         return GetAll().FirstOrDefaultAsync(p => p.Id == productId);
     }
+
+    public Task<Product[]> GetAllWithOrderDescByModifiedOn()
+    {
+        return GetAll().OrderByDescending(p => p.ModifiedOn).ToArrayAsync();
+    }
 }

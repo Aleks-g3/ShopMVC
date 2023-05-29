@@ -2,21 +2,25 @@
 
 namespace ShopMVC.ViewModels;
 
-public class ProductViewModel
+public class UpdatableProductViewModel
 {
     public string Name { get; private set; } = string.Empty;
     public string Category { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
     public int AvailableQuantity { get; private set; }
+    public DateTime ModifiedOn { get; private set; }
+    public string ModifiedBy { get; private set; } = string.Empty;
+    
 
-    public static ProductViewModel Create(Product product)
+    public static UpdatableProductViewModel Create(Product product)
     {
-        return new ProductViewModel()
+        return new UpdatableProductViewModel()
         {
             Name = product.Name,
             Category = product.Category.ToString(),
             Price = product.Price,
-            AvailableQuantity = product.AvailableQuantity
+            AvailableQuantity = product.AvailableQuantity,
+            ModifiedOn = product.ModifiedOn,
         };
     }
 }

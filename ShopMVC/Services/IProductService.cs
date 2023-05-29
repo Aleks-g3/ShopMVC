@@ -5,7 +5,7 @@ namespace ShopMVC.Services;
 
 public interface IProductService
 {
-    Task<ProductViewModel[]> GetAll();
-    Task<SimpleProductViewModel[]> GetAllSimpleProducts();
+    Task<UpdatableProductViewModel[]> GetAll();
+    Task<SimpleProductViewModel[]> GetSimpleProducts();
     Task Create(Product newProduct);
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ShopMVC.Data;
-using ShopMVC.Data.Repositories;
+﻿using ShopMVC.Data;
 using ShopMVC.Models.Shared;
 using ShopMVC.ViewModels;
 
@@ -17,22 +15,16 @@ public class ProductService : IProductService
         _unitOfWork = unitOfWork;
     }
 
-    public Task<ProductViewModel[]> GetAll()
+    public async Task<UpdatableProductViewModel[]> GetAll()
     {
-        return _unitOfWork.ProductRepository.GetAll().Select(product => ProductViewModel.Create(product))
-            .ToArrayAsync();
+        var products = await GetProducts();
+        return products.Select(UpdatableProductViewModel.Create).ToArray();
     }
 
-    public async Task<SimpleProductViewModel[]> GetAllSimpleProducts()
+    public async Task<SimpleProductViewModel[]> GetSimpleProducts()
     {
-        var products = await _unitOfWork.ProductRepository.GetAll().ToArrayAsync();
-
-        _logger.LogInformation($"Getting products is {products.Length}");
-        return products.Select(product => new SimpleProductViewModel()
-        {
-            Name = product.Name,
-            Price = product.Price
-        }).ToArray();
+        var products = await GetProducts();
+        return products.Select(SimpleProductViewModel.Create).ToArray();
     }
 
     public async Task Create(Product newProduct)
@@ -40,5 +32,12 @@ public class ProductService : IProductService
         _logger.LogInformation($"Creating product with name '{newProduct.Name}'");
         await _unitOfWork.ProductRepository.Create(newProduct);
         _logger.LogInformation($"Creating product with name '{newProduct.Name}' Finished");
+    }
+
+    private async Task<Product[]> GetProducts()
+    {
+        var products = await _unitOfWork.ProductRepository.GetAllWithOrderDescByModifiedOn();
+        _logger.LogInformation($"Getting products is {products.Length}");
+        return products;
     }
 }

@@ -6,4 +6,5 @@ namespace ShopMVC.Data.Repositories;
 public interface IProductRepository : IUpdateableRepository<Product>
 {
     Task<Product?> GetById(long productId);
+    Task<Product[]> GetAllWithOrderDescByModifiedOn();
 }
