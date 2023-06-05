@@ -16,9 +16,11 @@ public abstract class UpdateableRepository<T> : ReadOnlyRepository<T>, IUpdateab
     {
         if (item is null)
             throw new ArgumentNullException(nameof(item));
+        
+        var now = DateTime.UtcNow;
 
-        item.CreatedOn = DateTime.UtcNow;
-        item.ModifiedOn = DateTime.UtcNow;
+        item.CreatedOn = now;
+        item.ModifiedOn = now;
 
         await Entities.AddAsync(item);
 

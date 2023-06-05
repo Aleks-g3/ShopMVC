@@ -26,13 +26,13 @@ public class ProductService : IProductService
         return products.Select(SimpleProductViewModel.Create).ToArray();
     }
 
-    public async Task<UpdateProductFormDTO?> GetById(long productId)
+    public async Task<CreateUpdateProductFormDTO?> GetById(long productId)
     {
         var product = await _unitOfWork.ProductRepository.GetAll().FirstOrDefaultAsync(p => p.Id == productId);
         if (product is null)
             return null;
         
-        return UpdateProductFormDTO.Create(product);
+        return CreateUpdateProductFormDTO.Create(product);
     }
 
     public async Task Create(Product newProduct)

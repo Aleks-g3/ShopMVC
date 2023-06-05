@@ -1,12 +1,12 @@
 ﻿@using ShopMVC.Models.Shared
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model ShopMVC.ViewModels.UpdateProductFormDTO
+@model ShopMVC.ViewModels.CreateUpdateProductFormDTO
 
 @{
-    ViewData["Title"] = "Edit Product";
+	ViewData["Title"] = ViewBag.Action + " product";
 }
 
-<form asp-action="Edit">
+<form asp-action=@ViewBag.Action>
 	<div class="border p-3 mt-4">
 		<div class="row pb-2">
 			<h2 class="text-primary">@ViewData["Title"]</h2>
@@ -15,6 +15,10 @@
 		<div class="mb-3">
 			<label asp-for="Name"></label>
 			<input asp-for="Name" class="form-control"/>
+		</div>
+		<div class="mb-3">
+			<label asp-for="Description"></label>
+			<input asp-for="Description" class="form-control"/>
 		</div>
 		<div class="mb-3">
 			<label asp-for="Category"></label>
@@ -32,6 +36,6 @@
 			<input asp-for="AvailableQuantity" class="form-control"/>
 		</div>
 	    
-		<button type="submit" class="btn btn-primary" >Update</button>
+		<button type="submit" class="btn btn-primary">@(ViewBag.Action == "Create" ? "Create" : "Update") </button>
 	</div>
 </form>

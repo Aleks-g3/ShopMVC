@@ -28,7 +28,7 @@ public class ProductServiceDecorator : IProductService
         return simpleProductViewModels;
     }
 
-    public async Task<UpdateProductFormDTO?> GetById(long productId)
+    public async Task<CreateUpdateProductFormDTO?> GetById(long productId)
     {
         _logger.LogInformation($"Getting product with id '{productId}'");
         var updateProductFormDto = await _productService.GetById(productId);

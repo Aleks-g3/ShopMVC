@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopMVC.Extensions;
 using ShopMVC.Services;
 using ShopMVC.ViewModels;
@@ -18,14 +17,15 @@ public class ProductController : Controller
 
     public IActionResult Create()
     {
-        return View();
+        ViewBag.Action = "Create";
+        return View("CreateUpdateView");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Category,Price,AvailableQuantity")]CreateProductFormDTO createProductFormDto)
+    public async Task<IActionResult> Create([Bind("Name,Description,Category,Price,AvailableQuantity")]CreateUpdateProductFormDTO createUpdateProductFormDto)
     {
-        var newProduct = createProductFormDto.MapToProduct();
+        var newProduct = createUpdateProductFormDto.MapToProduct();
 
         await _productService.Create(newProduct);
 
@@ -43,13 +43,14 @@ public class ProductController : Controller
     public async Task<IActionResult> Edit(long productId)
     {
         var updatableProductViewModel = await _productService.GetById(productId);
-        return updatableProductViewModel is null ? View("NotFound") : View(updatableProductViewModel);
+        ViewBag.Action = "Edit";
+        return updatableProductViewModel is null ? View("NotFound") : View("CreateUpdateView",updatableProductViewModel);
     }
 
     [HttpPost("product/edit/{productId}")]
-    public async Task<IActionResult> Edit(long productId, [Bind("Name,Category,Price,AvailableQuantity")] UpdateProductFormDTO updateProductFormDto)
+    public async Task<IActionResult> Edit(long productId, [Bind("Name,Description,Category,Price,AvailableQuantity")] CreateUpdateProductFormDTO createUpdateProductFormDto)
     {
-        var existingProduct = updateProductFormDto.MapToProduct();
+        var existingProduct = createUpdateProductFormDto.MapToProduct();
 
         await _productService.Update(productId, existingProduct);
 

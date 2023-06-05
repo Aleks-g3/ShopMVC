@@ -6,6 +6,7 @@ public class UpdatableProductViewModel
 {
     public long Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
+    public string Description { get; private set; } = string.Empty;
     public string Category { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
     public int AvailableQuantity { get; private set; }
@@ -18,6 +19,7 @@ public class UpdatableProductViewModel
         return new UpdatableProductViewModel
         {
             Id = product.Id,
+            Description = product.Description,
             Name = product.Name,
             Category = product.Category.ToString(),
             Price = product.Price,

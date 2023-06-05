@@ -1,4 +1,6 @@
-﻿namespace ShopMVC.Data.Repositories;
+﻿using ShopMVC.Data.Repositories;
+
+namespace ShopMVC.Data;
 
 public class UnitOfWork : IUnitOfWork
 {
