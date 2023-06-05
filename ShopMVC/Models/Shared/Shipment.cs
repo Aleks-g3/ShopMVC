@@ -10,7 +10,7 @@ public class Shipment : UpdatableEntity
     public string ReceiverFullName { get; }
     public ShipmentMethod ShipmentMethod { get; }
 
-    public Shipment()
+    private Shipment()
     {
     }
 

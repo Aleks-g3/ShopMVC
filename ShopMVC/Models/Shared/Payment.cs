@@ -4,7 +4,7 @@ public class Payment : UpdatableEntity
 {
     public PaymentMethod PaymentMethod { get; private set; }
 
-    public Payment()
+    private Payment()
     {
     }
         
