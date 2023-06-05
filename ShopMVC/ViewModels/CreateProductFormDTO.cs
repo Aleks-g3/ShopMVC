@@ -2,7 +2,7 @@
 
 namespace ShopMVC.ViewModels;
 
-public class CreateProductFormDto
+public class CreateProductFormDTO
 {
     [Required]
     public string Name { get; set; } = string.Empty;
@@ -10,4 +10,5 @@ public class CreateProductFormDto
     public string Category { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int AvailableQuantity { get; set; }
+    public string CreatedBy { get; set; } = string.Empty;
 }

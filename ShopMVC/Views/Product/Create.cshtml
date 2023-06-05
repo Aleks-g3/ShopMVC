@@ -1,7 +1,7 @@
 ﻿@using ShopMVC.Models.Shared
-@model ShopMVC.ViewModels.CreateProductFormDto
+@model ShopMVC.ViewModels.CreateProductFormDTO
 
-<form method="post">
+<form asp-action="Create">
     <div class="border p-3 mt-4">
 	    <div class="row pb-2">
 		    <h2 class="text-primary">Create Product</h2>
@@ -13,7 +13,7 @@
 	    </div>
 	    <div class="mb-3">
 		    <label asp-for="Category"></label>
-		    <hr />
+		    <br/>
 	    <select asp-for="Category" asp-items="Html.GetEnumSelectList<Category>()">
 		    <option selected="selected" value="">Please select</option>
 	    </select>
@@ -27,6 +27,6 @@
 		    <input asp-for="AvailableQuantity" class="form-control"/>
 		    </div>
 
-    <button type="submit">Create</button>
+    <button type="submit" class="btn btn-primary">Create</button>
     </div>
 </form>

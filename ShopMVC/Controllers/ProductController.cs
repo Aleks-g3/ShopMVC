@@ -1,10 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using ShopMVC.Data.Repositories;
 using ShopMVC.Extensions;
 using ShopMVC.Services;
 using ShopMVC.ViewModels;
-using Controller = Microsoft.AspNetCore.Mvc.Controller;
 
 namespace ShopMVC.Controllers;
 
@@ -23,9 +21,9 @@ public class ProductController : Controller
         return View();
     }
 
-    [Microsoft.AspNetCore.Mvc.HttpPost]
-    [Microsoft.AspNetCore.Mvc.ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateProductFormDto createProductFormDto)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Name,Category,Price,AvailableQuantity")]CreateProductFormDTO createProductFormDto)
     {
         var newProduct = createProductFormDto.MapToProduct();
 
@@ -38,5 +36,35 @@ public class ProductController : Controller
     {
         var updatableProductViewModels = await _productService.GetAll();
         return View(updatableProductViewModels);
+    }
+
+
+    [HttpGet("product/edit/{productId}")]
+    public async Task<IActionResult> Edit(long productId)
+    {
+        var updatableProductViewModel = await _productService.GetById(productId);
+        return updatableProductViewModel is null ? View("NotFound") : View(updatableProductViewModel);
+    }
+
+    [HttpPost("product/edit/{productId}")]
+    public async Task<IActionResult> Edit(long productId, [Bind("Name,Category,Price,AvailableQuantity")] UpdateProductFormDTO updateProductFormDto)
+    {
+        var existingProduct = updateProductFormDto.MapToProduct();
+
+        await _productService.Update(productId, existingProduct);
+
+        return RedirectToAction("Manage");
+    }
+
+    [HttpPost("product/delete/{productId}"),ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirmed(long productId)
+    {
+        var updatableProductViewModel = await _productService.GetById(productId);
+        if (updatableProductViewModel is null)
+            return View("NotFound");
+
+        await _productService.Delete(productId);
+
+        return RedirectToAction("Manage");
     }
 }

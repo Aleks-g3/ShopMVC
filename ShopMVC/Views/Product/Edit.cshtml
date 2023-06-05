@@ -1,0 +1,37 @@
+﻿@using ShopMVC.Models.Shared
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ShopMVC.ViewModels.UpdateProductFormDTO
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<form asp-action="Edit">
+	<div class="border p-3 mt-4">
+		<div class="row pb-2">
+			<h2 class="text-primary">@ViewData["Title"]</h2>
+			<hr />
+		</div>
+		<div class="mb-3">
+			<label asp-for="Name"></label>
+			<input asp-for="Name" class="form-control"/>
+		</div>
+		<div class="mb-3">
+			<label asp-for="Category"></label>
+			<br/>
+			<select asp-for="Category" asp-items="Html.GetEnumSelectList<Category>()">
+				<option selected="selected" value="">Please select</option>
+			</select>
+		</div>
+		<div class="mb-3">
+			<label asp-for="Price"></label>
+			<input asp-for="Price" class="form-control"/>
+		</div>
+		<div class="mb-3">
+			<label asp-for="AvailableQuantity"></label>
+			<input asp-for="AvailableQuantity" class="form-control"/>
+		</div>
+	    
+		<button type="submit" class="btn btn-primary" >Update</button>
+	</div>
+</form>

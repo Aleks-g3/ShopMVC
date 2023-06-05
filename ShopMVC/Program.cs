@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShopMVC.Data;
 using ShopMVC.Data.Repositories;
+using ShopMVC.Decorators;
 using ShopMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.Decorate<IProductService, ProductServiceDecorator>();
+builder.Services.AddHttpContextAccessor();
+
+IServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
+ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+
+logger.LogInformation("Logger is working...");
 
 var app = builder.Build();
 

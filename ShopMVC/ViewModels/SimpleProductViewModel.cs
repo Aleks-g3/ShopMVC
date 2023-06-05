@@ -9,7 +9,7 @@ public class SimpleProductViewModel
 
     public static SimpleProductViewModel Create(Product product)
     {
-        return new SimpleProductViewModel()
+        return new SimpleProductViewModel
         {
             Name = product.Name,
             Price = product.Price
