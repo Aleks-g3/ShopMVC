@@ -45,11 +45,11 @@ public class Product : UpdatableEntity
         AvailableQuantity = existingProduct.AvailableQuantity;
     }
 
-    public void SetUser(string userId)
+    public void SetUser(string username)
     {
         if (string.IsNullOrWhiteSpace(CreatedBy))
-            CreatedBy = userId;
+            CreatedBy = username;
         
-        ModifiedBy = userId;
+        ModifiedBy = username;
     }
 }
