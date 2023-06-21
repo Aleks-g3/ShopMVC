@@ -7,19 +7,19 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _context;
     private ProductRepository _productRepository;
     private OrderRepository _orderRepository;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private CartRepository _cartRepository;
+    
 
-    public UnitOfWork(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+    public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public IProductRepository ProductRepository
     {
         get
         {
-            _productRepository ??= new ProductRepository(_context, _httpContextAccessor);
+            _productRepository ??= new ProductRepository(_context);
             return _productRepository;
         }
     }
@@ -30,6 +30,15 @@ public class UnitOfWork : IUnitOfWork
         {
             _orderRepository ??= new OrderRepository(_context);
             return _orderRepository;
+        }
+    }
+
+    public ICartRepository CartRepository
+    {
+        get
+        {
+            _cartRepository ??= new CartRepository(_context);
+            return _cartRepository;
         }
     }
 }

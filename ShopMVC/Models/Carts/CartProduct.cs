@@ -3,10 +3,15 @@ using ShopMVC.Models.Shared;
 
 namespace ShopMVC.Models.Carts;
 
-public class CartProduct
+public class CartProduct : UpdatableEntity
 {
-    public Product Product { get; private set; }
+    public long ProductId { get; private set; }
+    public virtual Product Product { get; private set; }
     public int Quantity { get; private set; }
+
+    private CartProduct()
+    {
+    }
 
     public CartProduct(Product product, int quantity)
     {
@@ -17,9 +22,14 @@ public class CartProduct
         }
 
         Quantity = quantity;
+
+        var now = DateTime.UtcNow;
+        
+        CreatedOn = now;
+        ModifiedOn = now;
     }
 
-    public void IncreaseQuantity() => Quantity++;
+    public void IncreaseQuantity(int quantity) => Quantity += quantity;
 
     public void DecreaseQuantity()
     {
@@ -29,5 +39,12 @@ public class CartProduct
         }
 
         Quantity--;
+    }
+
+    public void SetOnlyProductId()
+    {
+        var productId = Product.Id;
+        Product = null!;
+        ProductId = productId;
     }
 }

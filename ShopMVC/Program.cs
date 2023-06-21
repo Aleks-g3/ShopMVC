@@ -23,6 +23,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.Decorate<IProductService, ProductServiceDecorator>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.Decorate<ICartService, CartServiceDecorator>();
 builder.Services.AddHttpContextAccessor();
 
 IServiceProvider serviceProvider = builder.Services.BuildServiceProvider();

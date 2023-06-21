@@ -20,3 +20,34 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.vertical-center {
+  margin-left: 30%;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  width: 20%;
+}
+
+.bigger-margin {
+  margin-top: 3rem
+}
+.pieces-area {
+  margin-top: 5%;
+}
+
+.pieces-available, .pieces-minus {
+  float: left;
+}
+
+.pieces-plus, .pieces-label, .btn-cart {
+  margin-left : 5%;float:left;
+}
+
+.pieces-available-space {
+  margin-top: 5%;
+}

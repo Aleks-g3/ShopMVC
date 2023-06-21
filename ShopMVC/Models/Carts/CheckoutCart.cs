@@ -16,7 +16,7 @@ public class CheckoutCart
     internal CheckoutCart(Cart cart)
     {
         UserId = cart.UserId;
-        _products = cart.Products.ToList();
+        _products = cart.CartProducts.ToList();
     }
 
     public void SetShipment(Shipment shipment)

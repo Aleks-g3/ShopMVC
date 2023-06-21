@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopMVC.Extensions;
 using ShopMVC.Services;
 using ShopMVC.ViewModels;
 
 namespace ShopMVC.Controllers;
 
-[Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class ProductController : Controller
 {
     private readonly IProductService _productService;
@@ -42,7 +43,7 @@ public class ProductController : Controller
     [HttpGet("product/edit/{productId}")]
     public async Task<IActionResult> Edit(long productId)
     {
-        var updatableProductViewModel = await _productService.GetById(productId);
+        var updatableProductViewModel = await _productService.GetFormById(productId);
         ViewBag.Action = "Edit";
         return updatableProductViewModel is null ? View("NotFound") : View("CreateUpdateView",updatableProductViewModel);
     }
@@ -60,12 +61,23 @@ public class ProductController : Controller
     [HttpPost("product/delete/{productId}"),ActionName("Delete")]
     public async Task<IActionResult> DeleteConfirmed(long productId)
     {
-        var updatableProductViewModel = await _productService.GetById(productId);
+        var updatableProductViewModel = await _productService.GetFormById(productId);
         if (updatableProductViewModel is null)
             return View("NotFound");
 
         await _productService.Delete(productId);
 
         return RedirectToAction("Manage");
+    }
+
+    [HttpGet("product/{productId}/details")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetWithDetailsById(long productId)
+    {
+        var productWithDetailsViewModel = await _productService.GetWithDetailsById(productId);
+        if (productWithDetailsViewModel is null)
+            return View("NotFound");
+
+        return View("ProductWithDetailsView",productWithDetailsViewModel);
     }
 }

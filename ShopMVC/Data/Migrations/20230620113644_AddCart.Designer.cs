@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopMVC.Data;
 
@@ -11,9 +12,11 @@ using ShopMVC.Data;
 namespace ShopMVC.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230620113644_AddCart")]
+    partial class AddCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,7 +474,7 @@ namespace ShopMVC.Data.Migrations
             modelBuilder.Entity("ShopMVC.Models.Carts.CartProduct", b =>
                 {
                     b.HasOne("ShopMVC.Models.Carts.Cart", null)
-                        .WithMany("CartProducts")
+                        .WithMany("Products")
                         .HasForeignKey("CartId");
 
                     b.HasOne("ShopMVC.Models.Shared.Product", "Product")
@@ -511,7 +514,7 @@ namespace ShopMVC.Data.Migrations
 
             modelBuilder.Entity("ShopMVC.Models.Carts.Cart", b =>
                 {
-                    b.Navigation("CartProducts");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ShopMVC.Models.Orders.Order", b =>

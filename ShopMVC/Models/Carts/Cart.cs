@@ -1,41 +1,47 @@
-﻿using ShopMVC.Models.Exceptions;
+﻿using Microsoft.AspNetCore.Identity;
+using ShopMVC.Models.Exceptions;
 using ShopMVC.Models.Shared;
 
 namespace ShopMVC.Models.Carts;
 
-public class Cart
+public class Cart : UpdatableEntity
 {
-    private readonly List<CartProduct> _products = new();
+    private readonly List<CartProduct> _cartProducts = new();
     
     public string UserId { get; }
-    public IReadOnlyCollection<CartProduct> Products => _products;
+    public virtual IdentityUser User { get; private set; }
+    
+    public List<CartProduct> CartProducts => _cartProducts;
+    
+    private Cart(){}
     
     public Cart(string userId)
     {
         UserId = userId;
     }
     
-    public void AddProduct(Product product)
+    public void AddProduct(Product product, int quantity)
     {
-        var cartProduct = _products.SingleOrDefault(x => x.Product.Id == product.Id);
+        var cartProduct = _cartProducts.SingleOrDefault(x => x.Product.Id == product.Id);
 
-        if (cartProduct is {Quantity: > 2})
+        if (cartProduct is not null && cartProduct.Quantity + quantity > cartProduct.Product.AvailableQuantity)
         {
             throw new ExceededMaximumQuantityLimitException();
         }
 
-        if (cartProduct is {Quantity: <= 2})
+        if (cartProduct is not null)
         {
-            cartProduct.IncreaseQuantity();
+            cartProduct.IncreaseQuantity(quantity);
+            cartProduct.ModifiedOn =DateTime.UtcNow;
             return;
         }
 
-        _products.Add(new CartProduct(product, 1));
+        _cartProducts.Add(new CartProduct(product, quantity));
     }
 
     public void RemoveProduct(Product product)
     {
-        var cartProduct = _products.SingleOrDefault(x => x.Product.Id == product.Id);
+        var cartProduct = _cartProducts.SingleOrDefault(x => x.Product.Id == product.Id);
 
         if (cartProduct is null)
         {
@@ -45,11 +51,11 @@ public class Cart
         cartProduct.DecreaseQuantity();
     }
 
-    public void Clear() => _products.Clear();
+    public void Clear() => _cartProducts.Clear();
 
     public CheckoutCart Checkout()
     {
-        if (Products.Count == 0)
+        if (CartProducts.Count == 0)
         {
             throw new CannotCheckoutEmptyCartException();
         }

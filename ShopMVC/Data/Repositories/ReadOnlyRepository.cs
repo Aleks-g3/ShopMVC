@@ -4,7 +4,7 @@ using ShopMVC.Models;
 namespace ShopMVC.Data.Repositories;
 
 public abstract class ReadOnlyRepository<T> : IReadOnlyRepository<T>, IDisposable
-    where T : Entity
+    where T : UpdatableEntity
 {
     protected DbContext DbContext { get; }
 

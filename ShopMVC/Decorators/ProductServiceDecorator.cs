@@ -28,12 +28,20 @@ public class ProductServiceDecorator : IProductService
         return simpleProductViewModels;
     }
 
-    public async Task<CreateUpdateProductFormDTO?> GetById(long productId)
+    public async Task<ProductWithDetailsViewModel?> GetWithDetailsById(long productId)
     {
         _logger.LogInformation($"Getting product with id '{productId}'");
-        var updateProductFormDto = await _productService.GetById(productId);
+        var productWithDetailsViewModel = await _productService.GetWithDetailsById(productId);
         _logger.LogInformation($"Getting product with id '{productId}' finished");
-        return updateProductFormDto;
+        return productWithDetailsViewModel;
+    }
+
+    public async Task<CreateUpdateProductFormDTO?> GetFormById(long productId)
+    {
+        _logger.LogInformation($"Getting product with id '{productId}'");
+        var createUpdateProductFormDto = await _productService.GetFormById(productId);
+        _logger.LogInformation($"Getting product with id '{productId}' finished");
+        return createUpdateProductFormDto;
     }
 
     public async Task Create(Product newProduct)

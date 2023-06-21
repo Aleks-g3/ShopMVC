@@ -8,10 +8,12 @@ namespace ShopMVC.Services;
 public class ProductService : IProductService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProductService(IUnitOfWork unitOfWork)
+    public ProductService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
     {
         _unitOfWork = unitOfWork;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<UpdatableProductViewModel[]> GetAll()
@@ -26,9 +28,18 @@ public class ProductService : IProductService
         return products.Select(SimpleProductViewModel.Create).ToArray();
     }
 
-    public async Task<CreateUpdateProductFormDTO?> GetById(long productId)
+    public async Task<ProductWithDetailsViewModel?> GetWithDetailsById(long productId)
     {
-        var product = await _unitOfWork.ProductRepository.GetAll().FirstOrDefaultAsync(p => p.Id == productId);
+        var product = await _unitOfWork.ProductRepository.GetById(productId);
+        if (product is null)
+            return null;
+        
+        return ProductWithDetailsViewModel.Create(product);
+    }
+
+    public async Task<CreateUpdateProductFormDTO?> GetFormById(long productId)
+    {
+        var product = await _unitOfWork.ProductRepository.GetById(productId);
         if (product is null)
             return null;
         
@@ -40,6 +51,7 @@ public class ProductService : IProductService
         if (await _unitOfWork.ProductRepository.IsExist(newProduct.Name))
             throw new ArgumentException($"Product with name '{newProduct.Name}' already exists");
 
+        newProduct.UpsertUser(_httpContextAccessor.HttpContext!.User.Identity!.Name!);
         await _unitOfWork.ProductRepository.Create(newProduct);
     }
 
@@ -53,6 +65,7 @@ public class ProductService : IProductService
             throw new ArgumentException($"Product with name '{existingProduct.Name}' already exists");
 
         product.Update(existingProduct);
+        product.UpsertUser(_httpContextAccessor.HttpContext!.User.Identity!.Name!);
         
         await _unitOfWork.ProductRepository.Update(product);
     }

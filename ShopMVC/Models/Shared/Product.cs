@@ -53,7 +53,7 @@ public class Product : UpdatableEntity
         AvailableQuantity = existingProduct.AvailableQuantity;
     }
 
-    public void SetUser(string username)
+    public void UpsertUser(string username)
     {
         if (string.IsNullOrWhiteSpace(CreatedBy))
             CreatedBy = username;

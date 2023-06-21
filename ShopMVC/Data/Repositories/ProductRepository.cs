@@ -5,27 +5,10 @@ namespace ShopMVC.Data.Repositories;
 
 public class ProductRepository : UpdateableRepository<Product>, IProductRepository
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public ProductRepository(ApplicationDbContext applicationDbContext, IHttpContextAccessor httpContextAccessor) : base(applicationDbContext)
+    public ProductRepository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
     {
-        _httpContextAccessor = httpContextAccessor;
     }
-
-    public new async Task Create(Product item, bool saveChanges = true)
-    {
-        var username = _httpContextAccessor.HttpContext?.User.Identity!.Name!;
-        item.SetUser(username);
-        await base.Create(item, saveChanges);
-    }
-
-    public new async Task Update(Product item, bool saveChanges = true)
-    {
-        var username = _httpContextAccessor.HttpContext?.User.Identity!.Name!;
-        item.SetUser(username);
-        await base.Update(item, saveChanges);
-    }
-
+    
     public Task<Product?> GetById(long productId)
     {
         return GetAll().FirstOrDefaultAsync(p => p.Id == productId);
