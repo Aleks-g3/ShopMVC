@@ -17,6 +17,7 @@ public class CreateUpdateProductFormDTO
     [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
     public decimal Price { get; set; }
     [Range(0, int.MaxValue, ErrorMessage = "Available quantity cannot be negative")]
+    [Display(Name = "Available quantity")]
     public int AvailableQuantity { get; set; }
     public string? RowVersion { get; set; }
     

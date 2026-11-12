@@ -21,33 +21,12 @@ body {
   margin-bottom: 60px;
 }
 
-.vertical-center {
-  margin-left: 30%;
+/* Align the default Identity pages with the application's page headers. */
+main > h1 {
+  font-size: 2rem;
+  color: var(--bs-primary);
 }
 
-table {
-  width: 100%;
-}
-
-.product-details th {
-  width: 20%;
-}
-
-.bigger-margin {
-  margin-top: 3rem
-}
-.pieces-area {
-  margin-top: 5%;
-}
-
-.pieces-available, .pieces-minus {
-  float: left;
-}
-
-.pieces-plus, .pieces-label, .btn-cart {
-  margin-left : 5%;float:left;
-}
-
-.pieces-available-space {
-  margin-top: 5%;
+main .row > .col-lg-4.col-lg-offset-2 {
+  display: none;
 }

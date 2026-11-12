@@ -4,45 +4,50 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div class="vertical-center">
-    <div class="container p-3">
-        <div class="row pt-4">
-            <div class="col-6">
-                <h2 class="text-primary">@Model.Name</h2>
-                <hr/>
-            </div>
-        </div>
-        <table class="product-details">
-            <tr>
-                <th>Price</th>
-                <td>@Model.Price.ToString("0.00") PLN</td>
-            </tr>
-        </table>
-        <div class="col-6 pieces-area">
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-12 col-md-9 col-lg-7">
+            <h2 class="text-primary">@Model.Name</h2>
+            <hr/>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-3">Price</dt>
+                <dd class="col-sm-9 fw-semibold">@Model.Price.ToString("0.00") PLN</dd>
+            </dl>
+
             @if (Model.AvailableQuantity > 0)
             {
-                <form asp-controller="Cart" asp-action="AddProduct" asp-route-productId="@Model.Id">
-                    <label for="amount" class="visually-hidden">Quantity</label>
-                    <button type="button" class="pieces-minus btn btn-primary" onclick="minusClick()" id="minus-btn" aria-label="Decrease quantity"><i class="bi bi-dash-circle" aria-hidden="true"></i></button>
-                    <input type="number" class="pieces-label" id="amount" asp-for="Quantity" min="1" max="@Model.AvailableQuantity" readonly aria-label="Quantity" aria-describedby="amount-status">
-                    <button type="button" class="pieces-plus btn btn-primary" onclick="plusClick()" id="plus-btn" aria-label="Increase quantity"><i class="bi bi-plus-circle" aria-hidden="true"></i></button>
-                    <button type="submit" class="btn btn-primary btn-cart" aria-label="Add to cart"><i class="bi bi-cart-plus" aria-hidden="true"></i></button>
-                    <span id="amount-status" class="visually-hidden" aria-live="polite">@Model.Quantity</span>
+                <form asp-controller="Cart" asp-action="AddProduct" asp-route-productId="@Model.Id" class="mb-3">
+                    <label for="amount" class="form-label">Quantity</label>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <div class="input-group" style="max-width: 9rem;">
+                            <button type="button" class="btn btn-outline-primary" onclick="minusClick()" id="minus-btn" aria-label="Decrease quantity">
+                                <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" id="amount" asp-for="Quantity" min="1" max="@Model.AvailableQuantity" readonly aria-label="Quantity" aria-describedby="amount-status">
+                            <button type="button" class="btn btn-outline-primary" onclick="plusClick()" id="plus-btn" aria-label="Increase quantity">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-cart-plus me-1" aria-hidden="true"></i>Add to cart
+                        </button>
+                        <span id="amount-status" class="visually-hidden" aria-live="polite">@Model.Quantity</span>
+                    </div>
+                    <div class="form-text">@Model.AvailableQuantity pieces available</div>
                 </form>
             }
             else
             {
-                <p class="text-danger">Out of stock</p>
+                <p class="text-danger fw-semibold">Out of stock</p>
+                <p class="form-text">0 pieces available</p>
             }
+
+            <hr/>
+            <h3 class="h5">Description</h3>
+            <p>@Model.Description</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to products</a>
         </div>
-            <br/>
-            <div class="col-6 pieces-available-space">
-                <h6 class="pieces-available">@Model.AvailableQuantity Pieces available</h6>
-            </div>
-            <hr class="bigger-margin"/>
-            <div class="col-6">
-                <p>@Model.Description</p>
-            </div>
     </div>
 </div>
 

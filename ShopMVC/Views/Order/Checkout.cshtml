@@ -14,34 +14,34 @@
     </div>
 
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-12 col-md-7 order-2 order-md-1">
             <form asp-action="Checkout" method="post">
                 <div asp-validation-summary="All" class="text-danger"></div>
 
                 <h4>Shipment</h4>
                 <div class="mb-3">
-                    <label asp-for="Form.City"></label>
+                    <label asp-for="Form.City" class="form-label"></label>
                     <input asp-for="Form.City" class="form-control" aria-describedby="city-error"/>
                     <span asp-validation-for="Form.City" class="text-danger" id="city-error"></span>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Form.StreetName"></label>
+                    <label asp-for="Form.StreetName" class="form-label"></label>
                     <input asp-for="Form.StreetName" class="form-control" aria-describedby="street-error"/>
                     <span asp-validation-for="Form.StreetName" class="text-danger" id="street-error"></span>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Form.StreetNumber"></label>
-                    <input asp-for="Form.StreetNumber" class="form-control" type="number" min="1" aria-describedby="street-number-error"/>
+                    <label asp-for="Form.StreetNumber" class="form-label"></label>
+                    <input asp-for="Form.StreetNumber" class="form-control" type="number" min="1" placeholder="12" aria-describedby="street-number-error"/>
                     <span asp-validation-for="Form.StreetNumber" class="text-danger" id="street-number-error"></span>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Form.ReceiverFullName"></label>
+                    <label asp-for="Form.ReceiverFullName" class="form-label"></label>
                     <input asp-for="Form.ReceiverFullName" class="form-control" aria-describedby="receiver-error"/>
                     <span asp-validation-for="Form.ReceiverFullName" class="text-danger" id="receiver-error"></span>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Form.ShipmentMethod"></label>
-                    <select asp-for="Form.ShipmentMethod" class="form-select" id="shipment-method">
+                    <label asp-for="Form.ShipmentMethod" class="form-label"></label>
+                    <select asp-for="Form.ShipmentMethod" class="form-select">
                         <option value="@((int)ShipmentMethod.InPost)" data-cost="10">InPost (10.00 PLN)</option>
                         <option value="@((int)ShipmentMethod.Courier)" data-cost="20">Courier (20.00 PLN)</option>
                     </select>
@@ -50,43 +50,47 @@
 
                 <h4>Payment</h4>
                 <div class="mb-3">
-                    <label asp-for="Form.PaymentMethod"></label>
+                    <label asp-for="Form.PaymentMethod" class="form-label"></label>
                     <select asp-for="Form.PaymentMethod" class="form-select" asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
                     <span asp-validation-for="Form.PaymentMethod" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Place order</button>
-                <a asp-controller="Cart" asp-action="Index" class="btn btn-secondary">Back to cart</a>
+                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">Place order</button>
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-secondary">Back to cart</a>
+                </div>
             </form>
         </div>
 
-        <div class="col-md-5">
+        <div class="col-12 col-md-5 order-1 order-md-2 mb-4 mb-md-0">
             <h4>Order summary</h4>
-            <table class="table table-sm">
-                <tbody>
-                @foreach (var item in Model.Cart.Items)
-                {
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <tbody>
+                    @foreach (var item in Model.Cart.Items)
+                    {
+                        <tr>
+                            <td>@item.Name × @item.Quantity</td>
+                            <td class="text-end text-nowrap">@item.LineTotal.ToString("0.00") PLN</td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
                     <tr>
-                        <td>@item.Name × @item.Quantity</td>
-                        <td class="text-end">@item.LineTotal.ToString("0.00") PLN</td>
+                        <th scope="row">Products</th>
+                        <td class="text-end text-nowrap" id="products-total" data-total="@Model.Cart.TotalPrice.ToString("0.00")">@Model.Cart.TotalPrice.ToString("0.00") PLN</td>
                     </tr>
-                }
-                </tbody>
-                <tfoot>
-                <tr>
-                    <th scope="row">Products</th>
-                    <td class="text-end" id="products-total" data-total="@Model.Cart.TotalPrice.ToString("0.00")">@Model.Cart.TotalPrice.ToString("0.00") PLN</td>
-                </tr>
-                <tr>
-                    <th scope="row">Shipping</th>
-                    <td class="text-end" id="shipping-cost">10.00 PLN</td>
-                </tr>
-                <tr>
-                    <th scope="row">Total</th>
-                    <td class="text-end" id="order-total">@((Model.Cart.TotalPrice + 10m).ToString("0.00")) PLN</td>
-                </tr>
-                </tfoot>
-            </table>
+                    <tr>
+                        <th scope="row">Shipping</th>
+                        <td class="text-end text-nowrap" id="shipping-cost">10.00 PLN</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td class="text-end text-nowrap fw-bold" id="order-total">@((Model.Cart.TotalPrice + 10m).ToString("0.00")) PLN</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -94,7 +98,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial"/>
     <script type="text/javascript">
-        const shipmentMethod = document.getElementById("shipment-method");
+        const shipmentMethod = document.getElementById("Form_ShipmentMethod");
         const productsTotal = document.getElementById("products-total");
         const shippingCost = document.getElementById("shipping-cost");
         const orderTotal = document.getElementById("order-total");

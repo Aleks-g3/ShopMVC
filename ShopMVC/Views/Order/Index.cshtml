@@ -19,32 +19,36 @@
     }
     else
     {
-        <table class="table table-bordered table-striped align-middle">
-            <thead>
-            <tr>
-                <th scope="col">Order</th>
-                <th scope="col">Placed on</th>
-                <th scope="col">Status</th>
-                <th scope="col" class="text-end">Items</th>
-                <th scope="col" class="text-end">Total</th>
-                <th scope="col"><span class="visually-hidden">Actions</span></th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var order in Model)
-            {
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Order history">
+            <table class="table table-bordered table-striped align-middle">
+                <thead>
                 <tr>
-                    <td>#@order.Id</td>
-                    <td>@order.CreatedOn.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@order.Status</td>
-                    <td class="text-end">@order.ItemsCount</td>
-                    <td class="text-end">@order.TotalPrice.ToString("0.00") PLN</td>
-                    <td class="text-end">
-                        <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-primary">Details</a>
-                    </td>
+                    <th scope="col">Order</th>
+                    <th scope="col" class="d-none d-md-table-cell text-nowrap">Placed on</th>
+                    <th scope="col" class="d-none d-md-table-cell">Status</th>
+                    <th scope="col" class="d-none d-md-table-cell text-end">Items</th>
+                    <th scope="col" class="text-end text-nowrap">Total</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
                 </tr>
-            }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id
+                            <div class="d-md-none small text-muted">@order.CreatedOn.ToString("yyyy-MM-dd HH:mm")</div>
+                        </td>
+                        <td class="d-none d-md-table-cell text-nowrap">@order.CreatedOn.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="d-none d-md-table-cell">@order.Status</td>
+                        <td class="d-none d-md-table-cell text-end">@order.ItemsCount</td>
+                        <td class="text-end text-nowrap">@order.TotalPrice.ToString("0.00") PLN</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-primary">Details</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     }
 </div>

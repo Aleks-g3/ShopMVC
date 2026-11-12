@@ -24,7 +24,7 @@ public class OrderService : IOrderService
         if (cart is null || cart.CartProducts.Count == 0)
             throw new CannotCheckoutEmptyCartException();
 
-        var shipment = new Shipment(form.City, form.StreetName, form.StreetNumber,
+        var shipment = new Shipment(form.City, form.StreetName, form.StreetNumber!.Value,
             form.ReceiverFullName, form.ShipmentMethod);
         var payment = new Payment(form.PaymentMethod);
 
