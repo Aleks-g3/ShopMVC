@@ -23,6 +23,12 @@
 			<span asp-validation-for="Description" class="text-danger" id="description-error"></span>
 		</div>
 		<div class="mb-3">
+			<label asp-for="ImageUrl" class="form-label"></label>
+			<input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/product.jpg" aria-describedby="image-url-help image-url-error"/>
+			<div class="form-text" id="image-url-help">Optional. Absolute http(s) URL or a relative path.</div>
+			<span asp-validation-for="ImageUrl" class="text-danger" id="image-url-error"></span>
+		</div>
+		<div class="mb-3">
 			<label asp-for="Category" class="form-label"></label>
 			<select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<Category>()" aria-describedby="category-error">
 				<option value="">Please select</option>

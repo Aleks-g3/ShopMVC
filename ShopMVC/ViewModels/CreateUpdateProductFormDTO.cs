@@ -19,6 +19,9 @@ public class CreateUpdateProductFormDTO
     [Range(0, int.MaxValue, ErrorMessage = "Available quantity cannot be negative")]
     [Display(Name = "Available quantity")]
     public int AvailableQuantity { get; set; }
+    [Display(Name = "Image URL")]
+    [StringLength(500)]
+    public string? ImageUrl { get; set; }
     public string? RowVersion { get; set; }
     
     public static CreateUpdateProductFormDTO Create(Product product)
@@ -30,6 +33,7 @@ public class CreateUpdateProductFormDTO
             Category = product.Category,
             Price = product.Price,
             AvailableQuantity = product.AvailableQuantity,
+            ImageUrl = product.ImageUrl,
             RowVersion = Convert.ToBase64String(product.RowVersion)
         };
     }

@@ -58,10 +58,11 @@ public class ProductTests
     }
 
     [Fact]
-    public void Update_CopiesAllEditableFieldsIncludingCategory()
+    public void Update_CopiesAllEditableFieldsIncludingCategoryAndImage()
     {
         var product = new Product("Name", "Description", Category.Clothes, 10m, 1);
-        var updatedProduct = new Product("New name", "New description", Category.Watches, 20m, 3);
+        var updatedProduct = new Product("New name", "New description", Category.Watches, 20m, 3,
+            "https://example.com/watch.jpg");
 
         product.Update(updatedProduct);
 
@@ -70,6 +71,27 @@ public class ProductTests
         Assert.Equal(Category.Watches, product.Category);
         Assert.Equal(20m, product.Price);
         Assert.Equal(3, product.AvailableQuantity);
+        Assert.Equal("https://example.com/watch.jpg", product.ImageUrl);
+    }
+
+    [Theory]
+    [InlineData("https://example.com/product.jpg")]
+    [InlineData("http://example.com/product.jpg")]
+    [InlineData("/images/product.jpg")]
+    public void Constructor_WithSupportedImageUrl_SetsImageUrl(string imageUrl)
+    {
+        var product = new Product("Name", "Description", Category.Clothes, 10m, 1, imageUrl);
+
+        Assert.Equal(imageUrl, product.ImageUrl);
+    }
+
+    [Theory]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("ftp://example.com/product.jpg")]
+    public void Constructor_WithUnsupportedImageUrl_Throws(string imageUrl)
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Product("Name", "Description", Category.Clothes, 10m, 1, imageUrl));
     }
 
     [Fact]

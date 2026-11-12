@@ -10,6 +10,7 @@ public class ProductWithDetailsViewModel
     public decimal Price { get; set; }
     public int AvailableQuantity { get; set; }
     public int Quantity { get; set; } = 1;
+    public string? ImageUrl { get; set; }
 
     public static ProductWithDetailsViewModel Create(Product product)
     {
@@ -19,7 +20,8 @@ public class ProductWithDetailsViewModel
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
-            AvailableQuantity = product.AvailableQuantity
+            AvailableQuantity = product.AvailableQuantity,
+            ImageUrl = product.ImageUrl
         };
     }
 }

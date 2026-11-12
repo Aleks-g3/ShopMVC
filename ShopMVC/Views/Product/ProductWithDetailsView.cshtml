@@ -5,8 +5,22 @@
 }
 
 <div class="container p-3">
-    <div class="row pt-4">
-        <div class="col-12 col-md-9 col-lg-7">
+    <div class="row pt-4 g-4">
+        <div class="col-12 col-md-5">
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="img-fluid rounded product-detail-image" alt="@Model.Name"
+                     loading="lazy" referrerpolicy="no-referrer">
+            }
+            else
+            {
+                <div class="product-detail-placeholder bg-light rounded d-flex align-items-center justify-content-center text-secondary" role="img" aria-label="No product image">
+                    <i class="bi bi-image fs-1" aria-hidden="true"></i>
+                </div>
+            }
+        </div>
+
+        <div class="col-12 col-md-7">
             <h2 class="text-primary">@Model.Name</h2>
             <hr/>
 
@@ -24,7 +38,7 @@
                             <button type="button" class="btn btn-outline-primary" onclick="minusClick()" id="minus-btn" aria-label="Decrease quantity">
                                 <i class="bi bi-dash-lg" aria-hidden="true"></i>
                             </button>
-                            <input type="number" class="form-control text-center" id="amount" asp-for="Quantity" min="1" max="@Model.AvailableQuantity" readonly aria-label="Quantity" aria-describedby="amount-status">
+                            <input type="number" class="form-control text-center" id="amount" asp-for="Quantity" min="1" max="@Model.AvailableQuantity" step="1" inputmode="numeric" aria-label="Quantity" aria-describedby="amount-status">
                             <button type="button" class="btn btn-outline-primary" onclick="plusClick()" id="plus-btn" aria-label="Increase quantity">
                                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
                             </button>
@@ -57,6 +71,7 @@
         const plusBtn = document.getElementById("plus-btn");
         const amountField = document.getElementById("amount");
         const amountStatus = document.getElementById("amount-status");
+        const maxQuantity = @Model.AvailableQuantity;
 
         function updateButtons() {
             if (!amountField || !minusBtn || !plusBtn || !amountStatus)
@@ -64,8 +79,26 @@
 
             const currentValue = Number(amountField.value) || 0;
             minusBtn.disabled = currentValue <= 1;
-            plusBtn.disabled = currentValue >= @Model.AvailableQuantity;
+            plusBtn.disabled = currentValue >= maxQuantity;
             amountStatus.textContent = String(currentValue);
+        }
+
+        function clampQuantity() {
+            if (!amountField)
+                return;
+
+            let value = Number(amountField.value);
+            if (!Number.isFinite(value))
+                value = 1;
+
+            value = Math.trunc(value);
+            if (value < 1)
+                value = 1;
+            if (value > maxQuantity)
+                value = maxQuantity;
+
+            amountField.value = String(value);
+            updateButtons();
         }
 
         function minusClick() {
@@ -83,11 +116,15 @@
                 return;
 
             const currentValue = Number(amountField.value) || 0;
-            if (currentValue < @Model.AvailableQuantity)
+            if (currentValue < maxQuantity)
                 amountField.value = String(currentValue + 1);
             updateButtons();
         }
 
+        amountField?.addEventListener("input", updateButtons);
+        amountField?.addEventListener("change", clampQuantity);
+        amountField?.addEventListener("blur", clampQuantity);
+        amountField?.closest("form")?.addEventListener("submit", clampQuantity);
         updateButtons();
     </script>
 }

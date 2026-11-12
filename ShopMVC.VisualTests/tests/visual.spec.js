@@ -60,6 +60,9 @@ test('captures key pages and audits accessibility', async ({ page }, testInfo) =
     await expect(page).toHaveURL('/');
 
     await capture('product-create', '/Product/Create');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(page.locator('#Name')).toBeFocused();
+    await capture('product-create-validation');
     await page.locator('#Name').fill(productName);
     await page.locator('#Description').fill('Product created by the visual test suite.');
     await page.locator('#Category').selectOption('1');
@@ -74,7 +77,7 @@ test('captures key pages and audits accessibility', async ({ page }, testInfo) =
     await capture('home', '/');
     await capture('product-details', `/product/${productId}/details`);
 
-    await page.getByRole('button', { name: 'Increase quantity' }).click();
+    await page.locator('#amount').fill('2');
     await page.getByRole('button', { name: 'Add to cart' }).click();
     await expect(page.getByText('Product added to cart.')).toBeVisible();
 
