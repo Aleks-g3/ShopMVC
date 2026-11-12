@@ -1,9 +1,7 @@
-﻿@using Microsoft.AspNetCore.Html
-@using ShopMVC.ViewModels
-@model ShopMVC.ViewModels.ProductWithDetailsViewModel
+﻿@model ShopMVC.ViewModels.ProductWithDetailsViewModel
 
 @{
-    ViewData["Title"] = @Model.Name;
+    ViewData["Title"] = Model.Name;
 }
 
 <div class="vertical-center">
@@ -14,19 +12,28 @@
                 <hr/>
             </div>
         </div>
-        <table>
+        <table class="product-details">
             <tr>
                 <th>Price</th>
-                <td>@Model.Price PLN</td>
+                <td>@Model.Price.ToString("0.00") PLN</td>
             </tr>
         </table>
         <div class="col-6 pieces-area">
-            <form asp-controller="Cart" asp-action="AddProduct" asp-route-productId="@Model.Id">
-                <a class="pieces-minus btn btn-primary" onclick="minusClick()" id="minus-btn"><i class="bi bi-dash-circle"></i> </a>
-                <input type="number" class="pieces-label" id="amount" asp-for="Quantity" value="1" min="1" max="@Model.AvailableQuantity" readonly>
-                <a class="pieces-plus btn btn-primary" onclick="plusClick()" id="plus-btn"><i class="bi bi-plus-circle"></i></a>
-                <button type="submit" class="btn btn-primary btn-cart"><i class="bi bi-cart-plus"></i></button>
-            </form>
+            @if (Model.AvailableQuantity > 0)
+            {
+                <form asp-controller="Cart" asp-action="AddProduct" asp-route-productId="@Model.Id">
+                    <label for="amount" class="visually-hidden">Quantity</label>
+                    <button type="button" class="pieces-minus btn btn-primary" onclick="minusClick()" id="minus-btn" aria-label="Decrease quantity"><i class="bi bi-dash-circle" aria-hidden="true"></i></button>
+                    <input type="number" class="pieces-label" id="amount" asp-for="Quantity" min="1" max="@Model.AvailableQuantity" readonly aria-label="Quantity" aria-describedby="amount-status">
+                    <button type="button" class="pieces-plus btn btn-primary" onclick="plusClick()" id="plus-btn" aria-label="Increase quantity"><i class="bi bi-plus-circle" aria-hidden="true"></i></button>
+                    <button type="submit" class="btn btn-primary btn-cart" aria-label="Add to cart"><i class="bi bi-cart-plus" aria-hidden="true"></i></button>
+                    <span id="amount-status" class="visually-hidden" aria-live="polite">@Model.Quantity</span>
+                </form>
+            }
+            else
+            {
+                <p class="text-danger">Out of stock</p>
+            }
         </div>
             <br/>
             <div class="col-6 pieces-available-space">
@@ -39,22 +46,43 @@
     </div>
 </div>
 
-<script type="text/javascript">
-const minusBtn = document.getElementById("minus-btn");
-const plusBtn = document.getElementById("plus-btn");
-const amountField = document.getElementById('amount');
+@section Scripts {
+    <script type="text/javascript">
+        const minusBtn = document.getElementById("minus-btn");
+        const plusBtn = document.getElementById("plus-btn");
+        const amountField = document.getElementById("amount");
+        const amountStatus = document.getElementById("amount-status");
 
-function minusClick(){
-    const currentValue = Number(amountField.value) || 0;
-    if (currentValue > 1)
-        amountField.value = String(currentValue - 1);
+        function updateButtons() {
+            if (!amountField || !minusBtn || !plusBtn || !amountStatus)
+                return;
+
+            const currentValue = Number(amountField.value) || 0;
+            minusBtn.disabled = currentValue <= 1;
+            plusBtn.disabled = currentValue >= @Model.AvailableQuantity;
+            amountStatus.textContent = String(currentValue);
+        }
+
+        function minusClick() {
+            if (!amountField)
+                return;
+
+            const currentValue = Number(amountField.value) || 0;
+            if (currentValue > 1)
+                amountField.value = String(currentValue - 1);
+            updateButtons();
+        }
+
+        function plusClick() {
+            if (!amountField)
+                return;
+
+            const currentValue = Number(amountField.value) || 0;
+            if (currentValue < @Model.AvailableQuantity)
+                amountField.value = String(currentValue + 1);
+            updateButtons();
+        }
+
+        updateButtons();
+    </script>
 }
-
-function plusClick(){
-    const currentValue = Number(amountField.value) || 0;
-    if (currentValue < @Model.AvailableQuantity)
-        amountField.value = String(currentValue + 1);
-}
-
-</script>
-

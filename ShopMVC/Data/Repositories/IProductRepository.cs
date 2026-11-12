@@ -3,7 +3,7 @@ using ShopMVC.ViewModels;
 
 namespace ShopMVC.Data.Repositories;
 
-public interface IProductRepository : IUpdateableRepository<Product>
+public interface IProductRepository : IUpdatableRepository<Product>
 {
     Task<Product?> GetById(long productId);
     Task<bool> IsExist(string name);

@@ -1,6 +1,6 @@
 ﻿namespace ShopMVC.Data.Repositories;
 
-public interface IUpdateableRepository<T> : IReadOnlyRepository<T>
+public interface IUpdatableRepository<T> : IReadOnlyRepository<T>
 {
     Task DeleteById(long id);
 

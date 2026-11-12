@@ -1,18 +1,18 @@
-﻿using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ShopMVC.Models;
+using ShopMVC.Models.Exceptions;
 
 namespace ShopMVC.Data.Repositories;
 
-public abstract class UpdateableRepository<T> : ReadOnlyRepository<T>, IUpdateableRepository<T>
+public abstract class UpdatableRepository<T> : ReadOnlyRepository<T>, IUpdatableRepository<T>
     where T : UpdatableEntity
 {
-    protected UpdateableRepository(DbContext dbContext)
+    protected UpdatableRepository(DbContext dbContext)
         : base(dbContext)
     {
     }
 
-    public async Task Create(T item, bool saveChanges = true)
+    public virtual async Task Create(T item, bool saveChanges = true)
     {
         if (item is null)
             throw new ArgumentNullException(nameof(item));
@@ -57,9 +57,9 @@ public abstract class UpdateableRepository<T> : ReadOnlyRepository<T>, IUpdateab
         {
             await DbContext.SaveChangesAsync();
         }
-        catch (DbUpdateConcurrencyException exception) when (exception.Entries is not null)
+        catch (DbUpdateConcurrencyException exception)
         {
-            HandleConcurrencyException(exception);
+            throw CreateConcurrencyException(exception);
         }
         finally
         {
@@ -68,36 +68,30 @@ public abstract class UpdateableRepository<T> : ReadOnlyRepository<T>, IUpdateab
         }
     }
 
-    private static void HandleConcurrencyException(DbUpdateException e)
-    {
-        StringBuilder outputLines = new();
-        foreach (var entityEntry in e.Entries)
-        {
-            if (entityEntry.Entity is not UpdatableEntity updatableEntity)
-                continue;
-
-            outputLines.AppendLine(
-                $"DbUpdateConcurrencyException: Item \"{entityEntry.Entity.GetType().Name}\" Id= \"{updatableEntity.Id} \", ModifiedOn= \"{updatableEntity.ModifiedOn}\"");
-        }
-
-        throw new Exception(outputLines.ToString(), e);
-    }
-
-    public async Task Update(T item, bool saveChanges = true)
+    public virtual async Task Update(T item, bool saveChanges = true)
     {
         if (item is null)
             throw new ArgumentNullException(nameof(item));
 
         item.ModifiedOn = DateTime.UtcNow;
         Entities.Update(item);
-        try
-        {
-            DbContext.Entry(item).Property(o => o.CreatedOn).IsModified = false;
-            await DbContext.SaveChangesAsync();
-        }
-        finally
-        {
-            DbContext.Entry(item).State = EntityState.Detached;
-        }
+        DbContext.Entry(item).Property(o => o.CreatedOn).IsModified = false;
+
+        if (!saveChanges)
+            return;
+
+        await SaveChangesAsync();
+    }
+
+    private static ConcurrencyConflictException CreateConcurrencyException(DbUpdateConcurrencyException exception)
+    {
+        var conflictingEntities = exception.Entries
+            .Select(entry => entry.Entity is UpdatableEntity updatableEntity
+                ? $"{entry.Entity.GetType().Name}#{updatableEntity.Id}"
+                : entry.Entity.GetType().Name);
+
+        return new ConcurrencyConflictException(
+            $"The data was modified by another user. Conflicting entities: {string.Join(", ", conflictingEntities)}.",
+            exception);
     }
 }

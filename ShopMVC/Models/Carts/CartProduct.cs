@@ -6,7 +6,7 @@ namespace ShopMVC.Models.Carts;
 public class CartProduct : UpdatableEntity
 {
     public long ProductId { get; private set; }
-    public virtual Product Product { get; private set; }
+    public virtual Product Product { get; private set; } = null!;
     public int Quantity { get; private set; }
 
     private CartProduct()
@@ -29,11 +29,19 @@ public class CartProduct : UpdatableEntity
         ModifiedOn = now;
     }
 
-    public void IncreaseQuantity(int quantity) => Quantity += quantity;
+    public void IncreaseQuantity(int quantity)
+    {
+        if (quantity < 1)
+        {
+            throw new InvalidCartProductQuantityException();
+        }
+
+        Quantity += quantity;
+    }
 
     public void DecreaseQuantity()
     {
-        if (Quantity - 1 < 0)
+        if (Quantity <= 1)
         {
             throw new InvalidCartProductQuantityException();
         }
@@ -41,10 +49,12 @@ public class CartProduct : UpdatableEntity
         Quantity--;
     }
 
-    public void SetOnlyProductId()
+    public void KeepOnlyProductId()
     {
-        var productId = Product.Id;
+        if (Product is null)
+            return;
+
+        ProductId = Product.Id;
         Product = null!;
-        ProductId = productId;
     }
 }

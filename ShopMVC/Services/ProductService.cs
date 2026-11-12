@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ShopMVC.Data;
+﻿using ShopMVC.Data;
+using ShopMVC.Models.Exceptions;
 using ShopMVC.Models.Shared;
 using ShopMVC.ViewModels;
 
@@ -49,23 +49,30 @@ public class ProductService : IProductService
     public async Task Create(Product newProduct)
     {
         if (await _unitOfWork.ProductRepository.IsExist(newProduct.Name))
-            throw new ArgumentException($"Product with name '{newProduct.Name}' already exists");
+            throw new ArgumentException($"Product with name '{newProduct.Name}' already exists", nameof(newProduct));
 
-        newProduct.UpsertUser(_httpContextAccessor.HttpContext!.User.Identity!.Name!);
+        newProduct.UpsertUser(CurrentUserName);
         await _unitOfWork.ProductRepository.Create(newProduct);
     }
 
-    public async Task Update(long productId, Product existingProduct)
+    public async Task Update(long productId, Product updatedProduct, string? rowVersion)
     {
         var product = await _unitOfWork.ProductRepository.GetById(productId);
         if (product is null)
-            throw new ArgumentException($"Product with id '{productId}' not exist");
+            throw new ArgumentException($"Product with id '{productId}' does not exist", nameof(productId));
 
-        if (await _unitOfWork.ProductRepository.IsExistWithNameForOtherProductIds(productId, existingProduct.Name))
-            throw new ArgumentException($"Product with name '{existingProduct.Name}' already exists");
+        if (!string.IsNullOrWhiteSpace(rowVersion) &&
+            !string.Equals(Convert.ToBase64String(product.RowVersion), rowVersion, StringComparison.Ordinal))
+        {
+            throw new ConcurrencyConflictException(
+                "This product was modified by another user. Reload the form and try again.");
+        }
 
-        product.Update(existingProduct);
-        product.UpsertUser(_httpContextAccessor.HttpContext!.User.Identity!.Name!);
+        if (await _unitOfWork.ProductRepository.IsExistWithNameForOtherProductIds(productId, updatedProduct.Name))
+            throw new ArgumentException($"Product with name '{updatedProduct.Name}' already exists", nameof(updatedProduct));
+
+        product.Update(updatedProduct);
+        product.UpsertUser(CurrentUserName);
         
         await _unitOfWork.ProductRepository.Update(product);
     }
@@ -74,4 +81,8 @@ public class ProductService : IProductService
     {
         return _unitOfWork.ProductRepository.DeleteById(productId);
     }
+
+    private string CurrentUserName =>
+        _httpContextAccessor.HttpContext?.User.Identity?.Name
+        ?? throw new InvalidOperationException("Cannot determine the current user.");
 }

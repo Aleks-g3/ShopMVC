@@ -2,7 +2,8 @@
 
 namespace ShopMVC.Data.Repositories;
 
-public interface IOrderRepository : IUpdateableRepository<Order>
+public interface IOrderRepository : IUpdatableRepository<Order>
 {
     Task<Order?> GetById(long orderId);
+    Task<Order[]> GetByUserId(string userId);
 }

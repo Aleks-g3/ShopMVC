@@ -3,7 +3,7 @@ using ShopMVC.Models.Shared;
 
 namespace ShopMVC.Data.Repositories;
 
-public class ProductRepository : UpdateableRepository<Product>, IProductRepository
+public class ProductRepository : UpdatableRepository<Product>, IProductRepository
 {
     public ProductRepository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
     {

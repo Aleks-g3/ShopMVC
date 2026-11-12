@@ -7,17 +7,20 @@ namespace ShopMVC.Models.Orders;
 
 public class Order : UpdatableEntity
 {
-    private List<OrderLine> _lines;
+    public const string ShippingLineName = "Shipment";
+
+    private List<OrderLine> _lines = new();
     
-    public string UserId { get; private set; }
+    public string UserId { get; private set; } = null!;
     public IdentityUser User { get; private set; } = null!;
     public IReadOnlyCollection<OrderLine> Lines { get => _lines; }
-    public Shipment Shipment { get; private set; }
-    public Payment Payment { get; private set; }
+    public Shipment Shipment { get; private set; } = null!;
+    public Payment Payment { get; private set; } = null!;
     public OrderStatus Status { get; private set; }
     public bool IsCompleted => Status is OrderStatus.Canceled || Status is OrderStatus.Completed;
+    public decimal TotalPrice => _lines.Sum(line => line.UnitPrice * line.Quantity);
 
-    public Order()
+    private Order()
     {
     }
     
@@ -37,25 +40,21 @@ public class Order : UpdatableEntity
 
         public static Order CreateFromCheckout(CheckoutCart checkoutCart)
         {
+            var shipment = checkoutCart.Shipment ?? throw new InvalidShipmentException();
+            var payment = checkoutCart.Payment ?? throw new CannotPlaceOrderException();
+
             var orderLines = checkoutCart.Products
-                .Select((x, i) => new OrderLine(i, x.Product.Name, x.Product.Price, x.Quantity))
+                .Select((cartProduct, index) =>
+                    new OrderLine(index, cartProduct.Product.Name, cartProduct.Product.Price, cartProduct.Quantity))
                 .ToList();
 
-            var shipmentOrderLineNumber = orderLines.Max(x => x.OrderLineNumber) + 1;
-            var shipmentLine = new OrderLine(shipmentOrderLineNumber, "Shipment", 10, 1);
+            var shipmentOrderLineNumber = orderLines.Max(line => line.OrderLineNumber) + 1;
+            var shipmentLine = new OrderLine(shipmentOrderLineNumber, ShippingLineName, shipment.ShippingCost, 1);
             
             orderLines.Add(shipmentLine);
             
-            return new Order(checkoutCart.UserId, orderLines, checkoutCart.Shipment, checkoutCart.Payment);
+            return new Order(checkoutCart.UserId, orderLines, shipment, payment);
         }
-
-        public static Order CreateFromRawData(
-            string userId,
-            IReadOnlyCollection<OrderLine> lines,
-            Shipment shipment,
-            Payment payment,
-            Guid? id = null) 
-            => new Order(userId, lines, shipment, payment);
 
         public void Complete()
         {

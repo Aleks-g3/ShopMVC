@@ -8,8 +8,8 @@ public class Cart : UpdatableEntity
 {
     private readonly List<CartProduct> _cartProducts = new();
     
-    public string UserId { get; }
-    public virtual IdentityUser User { get; private set; }
+    public string UserId { get; } = null!;
+    public virtual IdentityUser User { get; private set; } = null!;
     
     public List<CartProduct> CartProducts => _cartProducts;
     
@@ -22,33 +22,44 @@ public class Cart : UpdatableEntity
     
     public void AddProduct(Product product, int quantity)
     {
-        var cartProduct = _cartProducts.SingleOrDefault(x => x.Product.Id == product.Id);
+        if (quantity < 1)
+            throw new InvalidCartProductQuantityException();
 
-        if (cartProduct is not null && cartProduct.Quantity + quantity > cartProduct.Product.AvailableQuantity)
-        {
-            throw new ExceededMaximumQuantityLimitException();
-        }
+        var cartProduct = _cartProducts.SingleOrDefault(existingCartProduct => existingCartProduct.Product.Id == product.Id);
 
-        if (cartProduct is not null)
+        if (cartProduct is null)
         {
-            cartProduct.IncreaseQuantity(quantity);
-            cartProduct.ModifiedOn =DateTime.UtcNow;
+            if (quantity > product.AvailableQuantity)
+                throw new MaximumQuantityLimitExceededException();
+
+            _cartProducts.Add(new CartProduct(product, quantity));
             return;
         }
 
-        _cartProducts.Add(new CartProduct(product, quantity));
+        if (cartProduct.Quantity + quantity > product.AvailableQuantity)
+            throw new MaximumQuantityLimitExceededException();
+
+        cartProduct.IncreaseQuantity(quantity);
+        cartProduct.ModifiedOn = DateTime.UtcNow;
     }
 
     public void RemoveProduct(Product product)
     {
-        var cartProduct = _cartProducts.SingleOrDefault(x => x.Product.Id == product.Id);
+        var cartProduct = _cartProducts.SingleOrDefault(existingCartProduct => existingCartProduct.Product.Id == product.Id);
 
         if (cartProduct is null)
         {
             throw new CartProductNotFoundException();
         }
 
+        if (cartProduct.Quantity == 1)
+        {
+            _cartProducts.Remove(cartProduct);
+            return;
+        }
+
         cartProduct.DecreaseQuantity();
+        cartProduct.ModifiedOn = DateTime.UtcNow;
     }
 
     public void Clear() => _cartProducts.Clear();

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ShopMVC.Models.Exceptions;
 
 namespace ShopMVC.Models.Shared;
 
@@ -18,46 +19,60 @@ public class Product : UpdatableEntity
     {
     }
 
-    public Product(string name, string description,string category, decimal price, int availableQuantity)
+    public Product(string name, string description,Category category, decimal price, int availableQuantity)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name cannot be empty");
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Description cannot be empty");
-        if (price <= 0)
-            throw new ArgumentException("Price cannot be equals 0");
-        if (availableQuantity < 0)
-            throw new ArgumentException("AvailableQuantity cannot be smaller than 0");
-        
+        Validate(name, description, category, price, availableQuantity);
+
         Name = name;
         Description = description;
-        Category = Enum.Parse<Category>(category);
+        Category = category;
         Price = price;
         AvailableQuantity = availableQuantity;
     }
 
-    public void Update(Product existingProduct)
+    public void Update(Product updatedProduct)
     {
-        if (string.IsNullOrWhiteSpace(existingProduct.Name))
-            throw new ArgumentException("Name cannot be empty");
-        if (string.IsNullOrWhiteSpace(existingProduct.Description))
-            throw new ArgumentException("Description cannot be empty");
-        if (existingProduct.Price <= 0)
-            throw new ArgumentException("Price cannot be equals 0");
-        if (existingProduct.AvailableQuantity < 0)
-            throw new ArgumentException("AvailableQuantity cannot be smaller than 0");
-        
-        Name = existingProduct.Name;
-        Description = existingProduct.Description;
-        Price = existingProduct.Price;
-        AvailableQuantity = existingProduct.AvailableQuantity;
+        Validate(updatedProduct.Name, updatedProduct.Description, updatedProduct.Category,
+            updatedProduct.Price, updatedProduct.AvailableQuantity);
+
+        Name = updatedProduct.Name;
+        Description = updatedProduct.Description;
+        Category = updatedProduct.Category;
+        Price = updatedProduct.Price;
+        AvailableQuantity = updatedProduct.AvailableQuantity;
     }
 
-    public void UpsertUser(string username)
+    public void UpsertUser(string userName)
     {
         if (string.IsNullOrWhiteSpace(CreatedBy))
-            CreatedBy = username;
+            CreatedBy = userName;
         
-        ModifiedBy = username;
+        ModifiedBy = userName;
+    }
+
+    public void DecreaseAvailableQuantity(int quantity)
+    {
+        if (quantity < 1)
+            throw new ArgumentOutOfRangeException(nameof(quantity));
+
+        if (quantity > AvailableQuantity)
+            throw new InsufficientStockException(Name, quantity, AvailableQuantity);
+
+        AvailableQuantity -= quantity;
+    }
+
+    private static void Validate(string name, string description, Category category, decimal price,
+        int availableQuantity)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name cannot be empty", nameof(name));
+        if (string.IsNullOrWhiteSpace(description))
+            throw new ArgumentException("Description cannot be empty", nameof(description));
+        if (!Enum.IsDefined(category))
+            throw new ArgumentException($"Category '{category}' is not supported", nameof(category));
+        if (price <= 0)
+            throw new ArgumentException("Price must be greater than 0", nameof(price));
+        if (availableQuantity < 0)
+            throw new ArgumentException("Available quantity cannot be negative", nameof(availableQuantity));
     }
 }

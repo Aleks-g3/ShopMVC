@@ -5,10 +5,10 @@ namespace ShopMVC.Models.Orders;
 
 public class OrderLine : UpdatableEntity
 {
-    public int OrderLineNumber { get; }
-    public string Name { get; } = string.Empty;
-    public decimal UnitPrice { get; }
-    public int Quantity { get; }
+    public int OrderLineNumber { get; private set; }
+    public string Name { get; private set; } = string.Empty;
+    public decimal UnitPrice { get; private set; }
+    public int Quantity { get; private set; }
 
     public OrderLine()
     {

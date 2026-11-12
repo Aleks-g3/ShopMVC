@@ -1,26 +1,55 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopMVC.Models.Carts;
-using ShopMVC.Models.Shared;
 
 namespace ShopMVC.Data.Repositories;
 
-public class CartRepository :  UpdateableRepository<Cart>, ICartRepository
+public class CartRepository : UpdatableRepository<Cart>, ICartRepository
 {
     public CartRepository(ApplicationDbContext applicationDbContext) : base(applicationDbContext)
     {
     }
 
-    public new async Task Create(Cart item, bool saveChanges = true)
+    public override async Task Create(Cart cart, bool saveChanges = true)
     {
-        item.CartProducts[0].SetOnlyProductId();
-        await base.Create(item, saveChanges);
+        ClearProductReferences(cart);
+        await base.Create(cart, saveChanges);
+    }
+
+    public override async Task Update(Cart cart, bool saveChanges = true)
+    {
+        ClearProductReferences(cart);
+        await base.Update(cart, saveChanges);
     }
 
     public Task<Cart?> GetByUserId(string userId)
     {
         return GetAll()
-            .Include(c => c.CartProducts)
-            .ThenInclude(cp => cp.Product)
-            .FirstOrDefaultAsync(c => c.UserId == userId);
+            .Include(cart => cart.CartProducts)
+            .ThenInclude(cartProduct => cartProduct.Product)
+            .FirstOrDefaultAsync(cart => cart.UserId == userId);
+    }
+
+    public async Task RemoveProducts(Cart cart, bool saveChanges = true)
+    {
+        ClearProductReferences(cart);
+        DbContext.Set<CartProduct>().RemoveRange(cart.CartProducts);
+
+        if (saveChanges)
+            await SaveChangesAsync();
+    }
+
+    public async Task DeleteProduct(CartProduct cartProduct, bool saveChanges = true)
+    {
+        cartProduct.KeepOnlyProductId();
+        DbContext.Set<CartProduct>().Remove(cartProduct);
+
+        if (saveChanges)
+            await SaveChangesAsync();
+    }
+
+    private static void ClearProductReferences(Cart cart)
+    {
+        foreach (var cartProduct in cart.CartProducts)
+            cartProduct.KeepOnlyProductId();
     }
 }

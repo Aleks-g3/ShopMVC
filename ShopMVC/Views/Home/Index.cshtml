@@ -20,7 +20,7 @@
                     <div class="card mb-3">
                         <div class="card-body">
                             <h5 class="card-title">@product.Name</h5>
-                            <p class="card-text">@product.Price</p>
+                            <p class="card-text">@product.Price.ToString("0.00") PLN</p>
                             <a class="btn btn-primary" asp-controller="Product" asp-action="GetWithDetailsById" asp-route-productId=@product.Id>Read more</a>
                         </div>
                     </div>

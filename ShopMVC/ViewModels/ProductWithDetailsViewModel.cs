@@ -9,9 +9,9 @@ public class ProductWithDetailsViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int AvailableQuantity { get; set; }
-    public int Quantity { get; set; }
+    public int Quantity { get; set; } = 1;
 
-    public static ProductWithDetailsViewModel? Create(Product product)
+    public static ProductWithDetailsViewModel Create(Product product)
     {
         return new ProductWithDetailsViewModel
         {

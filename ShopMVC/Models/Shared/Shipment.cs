@@ -1,14 +1,23 @@
-﻿using ShopMVC.Models.Exceptions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ShopMVC.Models.Exceptions;
 
 namespace ShopMVC.Models.Shared;
 
 public class Shipment : UpdatableEntity
 {
-    public string City { get; } = string.Empty;
-    public string StreetName { get; } = string.Empty;
-    public int StreetNumber { get; }
-    public string ReceiverFullName { get; }
-    public ShipmentMethod ShipmentMethod { get; }
+    public string City { get; private set; } = string.Empty;
+    public string StreetName { get; private set; } = string.Empty;
+    public int StreetNumber { get; private set; }
+    public string ReceiverFullName { get; private set; } = string.Empty;
+    public ShipmentMethod ShipmentMethod { get; private set; }
+
+    [NotMapped]
+    public decimal ShippingCost => ShipmentMethod switch
+    {
+        ShipmentMethod.InPost => 10m,
+        ShipmentMethod.Courier => 20m,
+        _ => throw new ArgumentOutOfRangeException(nameof(ShipmentMethod), ShipmentMethod, "Unsupported shipment method")
+    };
 
     private Shipment()
     {
@@ -27,7 +36,17 @@ public class Shipment : UpdatableEntity
             throw new InvalidShipmentException();
         }
 
+        if (streetNumber < 1)
+        {
+            throw new InvalidShipmentException();
+        }
+
         if (string.IsNullOrWhiteSpace(receiverFullName))
+        {
+            throw new InvalidShipmentException();
+        }
+
+        if (!Enum.IsDefined(shipmentMethod))
         {
             throw new InvalidShipmentException();
         }

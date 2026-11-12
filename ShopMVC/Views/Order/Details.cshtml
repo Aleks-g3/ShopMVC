@@ -1,0 +1,62 @@
+@model ShopMVC.ViewModels.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-12">
+            <h2 class="text-primary">Order #@Model.Id</h2>
+            <p class="text-muted">Placed on @Model.CreatedOn.ToString("yyyy-MM-dd HH:mm") — @Model.Status</p>
+            <hr/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <h4>Shipment</h4>
+            <address>
+                @Model.ReceiverFullName<br/>
+                @Model.StreetName @Model.StreetNumber<br/>
+                @Model.City<br/>
+                @Model.ShipmentMethod
+            </address>
+        </div>
+        <div class="col-md-5">
+            <h4>Payment</h4>
+            <p>@Model.PaymentMethod</p>
+        </div>
+    </div>
+
+    <h4>Items</h4>
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col" class="text-end">Unit price</th>
+            <th scope="col" class="text-center">Quantity</th>
+            <th scope="col" class="text-end">Line total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var line in Model.Lines)
+        {
+            <tr>
+                <td>@line.Name</td>
+                <td class="text-end">@line.UnitPrice.ToString("0.00") PLN</td>
+                <td class="text-center">@line.Quantity</td>
+                <td class="text-end">@line.LineTotal.ToString("0.00") PLN</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr>
+            <th colspan="3" scope="row">Total</th>
+            <th class="text-end">@Model.TotalPrice.ToString("0.00") PLN</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    <a asp-action="Index" class="btn btn-secondary">Back to orders</a>
+</div>

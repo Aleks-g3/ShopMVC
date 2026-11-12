@@ -3,7 +3,7 @@ using ShopMVC.Models;
 
 namespace ShopMVC.Data.Repositories;
 
-public abstract class ReadOnlyRepository<T> : IReadOnlyRepository<T>, IDisposable
+public abstract class ReadOnlyRepository<T> : IReadOnlyRepository<T>
     where T : UpdatableEntity
 {
     protected DbContext DbContext { get; }
@@ -16,6 +16,4 @@ public abstract class ReadOnlyRepository<T> : IReadOnlyRepository<T>, IDisposabl
     protected DbSet<T> Entities => DbContext.Set<T>();
 
     public IQueryable<T> GetAll() => Entities.AsNoTracking();
-
-    public void Dispose() => DbContext.Dispose();
 }

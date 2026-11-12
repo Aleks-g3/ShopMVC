@@ -9,5 +9,7 @@ public class UpdatableEntity : Entity
 
     public DateTime ModifiedOn { get; set; }
 
+    [Timestamp] public byte[] RowVersion { get; private set; } = null!;
+
     public bool IsTransient => Id == default;
 }
