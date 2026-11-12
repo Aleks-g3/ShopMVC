@@ -1,0 +1,73 @@
+@model ShopMVC.ViewModels.CartViewModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-12">
+            <h2 class="text-primary">Your cart</h2>
+            <hr/>
+        </div>
+    </div>
+
+    @if (Model.IsEmpty)
+    {
+        <p class="text-muted">Your cart is empty.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Continue shopping</a>
+    }
+    else
+    {
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Cart items">
+            <table class="table table-bordered table-striped align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col" class="d-none d-md-table-cell text-end text-nowrap">Unit price</th>
+                    <th scope="col" class="text-center">Quantity</th>
+                    <th scope="col" class="text-end text-nowrap">Line total</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Product" asp-action="GetWithDetailsById" asp-route-productId="@item.ProductId">@item.Name</a>
+                        </td>
+                        <td class="d-none d-md-table-cell text-end text-nowrap">@item.UnitPrice.ToString("0.00") PLN</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-end text-nowrap">@item.LineTotal.ToString("0.00") PLN</td>
+                        <td class="text-end text-nowrap">
+                            <form asp-action="RemoveProduct" asp-route-productId="@item.ProductId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Remove @item.Name">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                <tr class="d-none d-md-table-row">
+                    <th colspan="3" scope="row">Total (@Model.TotalQuantity items)</th>
+                    <th class="text-end text-nowrap">@Model.TotalPrice.ToString("0.00") PLN</th>
+                    <th></th>
+                </tr>
+                <tr class="d-md-none">
+                    <th colspan="2" scope="row">Total (@Model.TotalQuantity items)</th>
+                    <th class="text-end text-nowrap">@Model.TotalPrice.ToString("0.00") PLN</th>
+                    <th></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Continue shopping</a>
+            <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary">Checkout</a>
+        </div>
+    }
+</div>

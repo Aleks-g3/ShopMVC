@@ -1,0 +1,54 @@
+@model ShopMVC.ViewModels.OrderSummaryViewModel[]
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="container p-3">
+    <div class="row pt-4">
+        <div class="col-12">
+            <h2 class="text-primary">Your orders</h2>
+            <hr/>
+        </div>
+    </div>
+
+    @if (Model.Length == 0)
+    {
+        <p class="text-muted">You have not placed any orders yet.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Start shopping</a>
+    }
+    else
+    {
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Order history">
+            <table class="table table-bordered table-striped align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col" class="d-none d-md-table-cell text-nowrap">Placed on</th>
+                    <th scope="col" class="d-none d-md-table-cell">Status</th>
+                    <th scope="col" class="d-none d-md-table-cell text-end">Items</th>
+                    <th scope="col" class="text-end text-nowrap">Total</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id
+                            <div class="d-md-none small text-muted">@order.CreatedOn.ToString("yyyy-MM-dd HH:mm")</div>
+                        </td>
+                        <td class="d-none d-md-table-cell text-nowrap">@order.CreatedOn.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="d-none d-md-table-cell">@order.Status</td>
+                        <td class="d-none d-md-table-cell text-end">@order.ItemsCount</td>
+                        <td class="text-end text-nowrap">@order.TotalPrice.ToString("0.00") PLN</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-primary">Details</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

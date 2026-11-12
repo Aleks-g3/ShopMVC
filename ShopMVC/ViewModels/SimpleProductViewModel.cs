@@ -5,8 +5,9 @@ namespace ShopMVC.ViewModels;
 public class SimpleProductViewModel
 {
     public long Id { get; private set; }
-    public string Name { get; private set; } 
+    public string Name { get; private set; } = string.Empty;
     public decimal Price { get; private set; }
+    public string? ImageUrl { get; private set; }
 
     public static SimpleProductViewModel Create(Product product)
     {
@@ -14,7 +15,8 @@ public class SimpleProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
-            Price = product.Price
+            Price = product.Price,
+            ImageUrl = product.ImageUrl
         };
     }
 }

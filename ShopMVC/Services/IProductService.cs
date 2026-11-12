@@ -10,6 +10,6 @@ public interface IProductService
     Task<ProductWithDetailsViewModel?> GetWithDetailsById(long productId);
     Task<CreateUpdateProductFormDTO?> GetFormById(long productId);
     Task Create(Product newProduct);
-    Task Update(long productId, Product existingProduct);
+    Task Update(long productId, Product updatedProduct, string? rowVersion);
     Task Delete(long productId);
 }

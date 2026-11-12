@@ -1,9 +1,10 @@
-﻿using ShopMVC.Models.Carts;
-using ShopMVC.Models.Shared;
+﻿using ShopMVC.ViewModels;
 
 namespace ShopMVC.Services;
 
 public interface ICartService
 {
     Task Upsert(long productId, int quantity);
+    Task<CartViewModel> GetCart();
+    Task RemoveProduct(long productId);
 }

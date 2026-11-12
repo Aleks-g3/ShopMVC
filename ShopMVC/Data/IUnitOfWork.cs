@@ -7,4 +7,7 @@ public interface IUnitOfWork
     IProductRepository ProductRepository { get; }
     IOrderRepository OrderRepository { get; }
     ICartRepository CartRepository { get; }
+
+    Task SaveChangesAsync();
+    Task ExecuteInTransactionAsync(Func<Task> action);
 }

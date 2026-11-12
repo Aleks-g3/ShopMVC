@@ -6,94 +6,64 @@
 
 <div class="container p-3">
     <div class="row pt-4">
-        <div class="col-6">
-            <h2 class="text-primary">List Products</h2>
+        <div class="col-12 col-sm-6">
+            <h2 class="text-primary">Manage products</h2>
         </div>
-        <div class="col-6 text-end">
+        <div class="col-12 col-sm-6 text-sm-end mt-3 mt-sm-0">
             <a asp-controller="Product" asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i>&nbsp; Create Product
+                <i class="bi bi-plus-circle" aria-hidden="true"></i>&nbsp; Create Product
             </a>
         </div>
     </div>
     <br/>
-    <table class="table table-bordered table-striped" style="width: 100%">
-        <tr>
-            <td>Name</td>
-            <td>Category</td>
-            <td>Available Quantity</td>
-            <td>Price</td>
-            <td>Modified On</td>
-            <td>Modified By</td>
-            <td>Action</td>
-        </tr>
-        @foreach (var product in Model)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Category</td>
-                <td>@product.AvailableQuantity</td>
-                <td>@product.Price</td>
-                <td>@product.ModifiedOn</td>
-                <td>@product.ModifiedBy</td>
-                <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-productId="@product.Id">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" id="btnShowModal" data-target="#exampleModal">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure that deleting product @product.Name?
-                                </div>
-                                <div class="modal-footer">
-                                    <form asp-action="Delete" asp-route-productId="@product.Id">
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnHideModal">Cancel</button>
-                                            <input type="submit" value="Yes" class="btn btn-primary"/>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        }
-    </table>
-
-</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>  
-<script type="text/javascript">  
-        $(document).ready(function () {  
-            $("#btnShowModal").click(function () {  
-                $("#exampleModal").modal('show');  
-            });  
-  
-            $("#btnHideModal").click(function () {  
-                $("#exampleModal").modal('hide');  
-            });
-            
-            $("#btnDelete").click(function (){
-                var productId = $('productId').val();
-                $.ajax({
-                type: "POST",
-                uri: "/Product/Delete",
-                data: {productId : productId},
-                success: function (result){
-                    if (!result){
-                        alert("Opps something wrong");
-                    }
+    @if (Model.Length == 0)
+    {
+        <p class="text-muted">No products yet. Use the "Create Product" button to add the first one.</p>
+    }
+    else
+    {
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Product list">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col" class="d-none d-md-table-cell">Category</th>
+                    <th scope="col" class="text-end text-nowrap">
+                        <span class="d-none d-md-inline">Available Quantity</span>
+                        <span class="d-md-none">Qty</span>
+                    </th>
+                    <th scope="col" class="text-end text-nowrap">Price</th>
+                    <th scope="col" class="d-none d-md-table-cell text-nowrap">Modified On</th>
+                    <th scope="col" class="d-none d-md-table-cell">Modified By</th>
+                    <th scope="col" class="text-nowrap">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td class="d-none d-md-table-cell">@product.Category</td>
+                        <td class="text-end">@product.AvailableQuantity</td>
+                        <td class="text-end text-nowrap">@product.Price.ToString("0.00") PLN</td>
+                        <td class="d-none d-md-table-cell text-nowrap">@product.ModifiedOn.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="d-none d-md-table-cell">@product.ModifiedBy</td>
+                        <td class="text-nowrap">
+                            <a class="btn btn-primary" asp-action="Edit" asp-route-productId="@product.Id" aria-label="Edit @product.Name">
+                                <i class="bi bi-pencil-fill" aria-hidden="true"></i>
+                            </a>
+                            <form asp-action="Delete" asp-route-productId="@product.Id" method="post" class="d-inline"
+                                  data-product-name="@product.Name"
+                                  onsubmit="return confirm('Delete this product (' + this.dataset.productName + ')? This cannot be undone.');">
+                                <button type="submit" class="btn btn-danger" aria-label="Delete @product.Name">
+                                    <i class="bi bi-trash-fill" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                 }
-                })
-            })
-        });  
-    </script> 
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

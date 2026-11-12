@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopMVC.Extensions;
+using ShopMVC.Models.Exceptions;
 using ShopMVC.Services;
 using ShopMVC.ViewModels;
 
@@ -18,19 +19,28 @@ public class ProductController : Controller
 
     public IActionResult Create()
     {
-        ViewBag.Action = "Create";
-        return View("CreateUpdateView");
+        return RenderCreateUpdateView("Create", new CreateUpdateProductFormDTO());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Name,Description,Category,Price,AvailableQuantity")]CreateUpdateProductFormDTO createUpdateProductFormDto)
     {
-        var newProduct = createUpdateProductFormDto.MapToProduct();
+        if (!ModelState.IsValid)
+            return RenderCreateUpdateView("Create", createUpdateProductFormDto);
 
-        await _productService.Create(newProduct);
+        try
+        {
+            await _productService.Create(createUpdateProductFormDto.MapToProduct());
+        }
+        catch (ArgumentException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return RenderCreateUpdateView("Create", createUpdateProductFormDto);
+        }
 
-        return RedirectToAction("Manage");
+        TempData["SuccessMessage"] = "Product has been created.";
+        return RedirectToAction(nameof(Manage));
     }
 
     public async Task<IActionResult> Manage()
@@ -44,21 +54,42 @@ public class ProductController : Controller
     public async Task<IActionResult> Edit(long productId)
     {
         var updatableProductViewModel = await _productService.GetFormById(productId);
-        ViewBag.Action = "Edit";
-        return updatableProductViewModel is null ? View("NotFound") : View("CreateUpdateView",updatableProductViewModel);
+        if (updatableProductViewModel is null)
+            return View("NotFound");
+
+        return RenderCreateUpdateView("Edit", updatableProductViewModel, productId);
     }
 
     [HttpPost("product/edit/{productId}")]
-    public async Task<IActionResult> Edit(long productId, [Bind("Name,Description,Category,Price,AvailableQuantity")] CreateUpdateProductFormDTO createUpdateProductFormDto)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(long productId,
+        [Bind("Name,Description,Category,Price,AvailableQuantity,RowVersion")] CreateUpdateProductFormDTO createUpdateProductFormDto)
     {
-        var existingProduct = createUpdateProductFormDto.MapToProduct();
+        if (!ModelState.IsValid)
+            return RenderCreateUpdateView("Edit", createUpdateProductFormDto, productId);
 
-        await _productService.Update(productId, existingProduct);
+        try
+        {
+            await _productService.Update(productId, createUpdateProductFormDto.MapToProduct(),
+                createUpdateProductFormDto.RowVersion);
+        }
+        catch (ArgumentException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return RenderCreateUpdateView("Edit", createUpdateProductFormDto, productId);
+        }
+        catch (ConcurrencyConflictException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return RenderCreateUpdateView("Edit", createUpdateProductFormDto, productId);
+        }
 
-        return RedirectToAction("Manage");
+        TempData["SuccessMessage"] = "Product has been updated.";
+        return RedirectToAction(nameof(Manage));
     }
 
     [HttpPost("product/delete/{productId}"),ActionName("Delete")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(long productId)
     {
         var updatableProductViewModel = await _productService.GetFormById(productId);
@@ -67,7 +98,8 @@ public class ProductController : Controller
 
         await _productService.Delete(productId);
 
-        return RedirectToAction("Manage");
+        TempData["SuccessMessage"] = "Product has been deleted.";
+        return RedirectToAction(nameof(Manage));
     }
 
     [HttpGet("product/{productId}/details")]
@@ -79,5 +111,13 @@ public class ProductController : Controller
             return View("NotFound");
 
         return View("ProductWithDetailsView",productWithDetailsViewModel);
+    }
+
+    private IActionResult RenderCreateUpdateView(string action, CreateUpdateProductFormDTO createUpdateProductFormDto,
+        long? productId = null)
+    {
+        ViewBag.Action = action;
+        ViewBag.ProductId = productId;
+        return View("CreateUpdateView", createUpdateProductFormDto);
     }
 }

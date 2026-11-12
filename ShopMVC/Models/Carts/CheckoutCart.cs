@@ -9,9 +9,13 @@ public class CheckoutCart
     private readonly List<CartProduct> _products;
 
     public string UserId { get; }
-    public Shipment Shipment { get; private set; }
-    public Payment Payment { get; private set; }
+    public Shipment? Shipment { get; private set; }
+    public Payment? Payment { get; private set; }
     public IReadOnlyCollection<CartProduct> Products => _products;
+
+    public decimal ProductsPrice => _products.Sum(product => product.Quantity * product.Product.Price);
+    public decimal ShippingCost => Shipment?.ShippingCost ?? 0m;
+    public decimal TotalPrice => ProductsPrice + ShippingCost;
 
     internal CheckoutCart(Cart cart)
     {
@@ -24,10 +28,7 @@ public class CheckoutCart
 
     public void SetPayment(Payment payment)
     {
-        var cartValue = _products.Sum(x => x.Quantity * x.Product.Price);
-
-        // does this logic belong to the Cart itself?
-        if (cartValue > 20_000 && payment.PaymentMethod is PaymentMethod.Cash)
+        if (ProductsPrice > 20_000 && payment.PaymentMethod is PaymentMethod.Cash)
         {
             throw new PaymentMethodNotAllowedException();
         }
@@ -37,6 +38,12 @@ public class CheckoutCart
 
     public Order PlaceOrder()
     {
+        if (Shipment is null)
+            throw new InvalidShipmentException();
+
+        if (Payment is null)
+            throw new CannotPlaceOrderException();
+
         return Order.CreateFromCheckout(this);
     }
 }
